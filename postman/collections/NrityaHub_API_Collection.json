@@ -1,0 +1,1116 @@
+{
+	"info": {
+		"_postman_id": "nrityahub-api-collection-v1",
+		"name": "NrityaHub Backend API Collection",
+		"description": "Complete API Collection for NrityaHub Dance Academy Management System.\nCovers Admin, Instructor, and Student roles with authentication, user management, batch control, attendance marking, homework submissions, instructor reviews, fee tracking, staff payouts, and announcements.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost/nrityahub_backend",
+			"type": "string"
+		},
+		{
+			"key": "admin_id",
+			"value": "10",
+			"type": "string"
+		},
+		{
+			"key": "instructor_id",
+			"value": "11",
+			"type": "string"
+		},
+		{
+			"key": "student_id",
+			"value": "20",
+			"type": "string"
+		},
+		{
+			"key": "batch_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "submission_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login - Admin (Dr. Rukmini Devi)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"rukmini.admin\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login.php"
+							]
+						},
+						"description": "Authenticates Admin and returns full admin profile with role 'admin'."
+					}
+				},
+				{
+					"name": "Login - Instructor (Meera Iyer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"meera.iyer\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login.php"
+							]
+						},
+						"description": "Authenticates Instructor and returns instructor details with role 'instructor'."
+					}
+				},
+				{
+					"name": "Login - Student (Ananya Rao)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"ananya.rao\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login.php"
+							]
+						},
+						"description": "Authenticates Student and returns student batch info with role 'student'."
+					}
+				},
+				{
+					"name": "Signup - Public Student Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"Niharika Sen\",\n    \"email\": \"niharika.sen@example.com\",\n    \"password\": \"Password123!\",\n    \"mobile\": \"9876543299\",\n    \"batch_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup.php"
+							]
+						},
+						"description": "Standard registration for a student."
+					}
+				},
+				{
+					"name": "Forgot Password - Check Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ananya.rao@nritahub.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgotpasswd.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"forgotpasswd.php"
+							]
+						}
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ananya.rao@nritahub.com\",\n    \"new_password\": \"NewPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/resetpasswd.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"resetpasswd.php"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Admin - Users & Staff Management",
+			"item": [
+				{
+					"name": "Admin Dashboard Stats & Overview",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/dashboard_stats.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"dashboard_stats.php"
+							]
+						},
+						"description": "Returns enrolled student count, staff count, batch count, calculated salary, fee collection progress."
+					}
+				},
+				{
+					"name": "Admin - List All Users",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/list_users.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"list_users.php"
+							]
+						},
+						"description": "Lists all users across roles."
+					}
+				},
+				{
+					"name": "Admin - List Students Only",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/list_users.php?role=student",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"list_users.php"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "student"
+								}
+							]
+						},
+						"description": "Filters users by role=student, returns batch name, attendance percentages, initials."
+					}
+				},
+				{
+					"name": "Admin - List Instructors & Staff",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/list_users.php?role=instructor",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"list_users.php"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "instructor"
+								}
+							]
+						},
+						"description": "Filters users by role=instructor with staff_role and monthly_salary."
+					}
+				},
+				{
+					"name": "Admin - Create Instructor Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"creator_id\": {{admin_id}},\n    \"full_name\": \"Vidwan Krishna Prasad\",\n    \"role\": \"instructor\",\n    \"staff_role\": \"Senior Nattuvangam & Mridangam Instructor\",\n    \"monthly_salary\": \"₹42,000 / mo\",\n    \"password\": \"Nrita2026#\",\n    \"email\": \"krishna.mridangam@nritahub.com\",\n    \"mobile\": \"9876543290\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/create_user.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"create_user.php"
+							]
+						},
+						"description": "Admin creates instructor with salary and role."
+					}
+				},
+				{
+					"name": "Admin - Create Student Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"creator_id\": {{admin_id}},\n    \"full_name\": \"Tanvi Hegde\",\n    \"role\": \"student\",\n    \"batch_id\": 1,\n    \"password\": \"Nrita2026#\",\n    \"email\": \"tanvi.hegde@nritahub.com\",\n    \"mobile\": \"9876543291\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/create_user.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"create_user.php"
+							]
+						},
+						"description": "Admin creates a student account and assigns to a batch."
+					}
+				},
+				{
+					"name": "Admin - Get Single User Details",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/get_user.php?id={{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"get_user.php"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{student_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Admin - Update User Information",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{student_id}},\n    \"full_name\": \"Ananya Rao Updated\",\n    \"mobile\": \"9876543231\",\n    \"bio\": \"Passionate Bharatanatyam practitioner.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/update_user.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"update_user.php"
+							]
+						}
+					}
+				},
+				{
+					"name": "Admin - Delete User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 999\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/delete_user.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"delete_user.php"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Admin - Batch Management",
+			"item": [
+				{
+					"name": "List All Batches",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/batches/list_batches.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"list_batches.php"
+							]
+						},
+						"description": "Returns all batches with instructor details, enrolled count, available spaces, and schedules."
+					}
+				},
+				{
+					"name": "Create New Batch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batch_name\": \"Bharatanatyam - Intermediate I2\",\n    \"dance_style\": \"Bharatanatyam\",\n    \"level\": \"Intermediate\",\n    \"instructor_id\": {{instructor_id}},\n    \"capacity\": 20,\n    \"studio\": \"Studio 2\",\n    \"days\": [\"Mon\", \"Wed\", \"Fri\"],\n    \"start_time\": \"4:00 PM\",\n    \"end_time\": \"5:30 PM\",\n    \"monthly_tuition\": \"₹3,200\",\n    \"status\": \"Active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches/create_batch.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"create_batch.php"
+							]
+						},
+						"description": "Admin creates a new batch."
+					}
+				},
+				{
+					"name": "Get Batch Details & Student Roster",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/batches/get_batch.php?id={{batch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"get_batch.php"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{batch_id}}"
+								}
+							]
+						},
+						"description": "Fetches batch schedule, studio, instructor, and list of all enrolled students with attendance summaries."
+					}
+				},
+				{
+					"name": "Update Batch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{batch_id}},\n    \"capacity\": 26,\n    \"monthly_tuition\": \"₹2,500\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches/update_batch.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"update_batch.php"
+							]
+						}
+					}
+				},
+				{
+					"name": "Assign Student to Batch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batch_id\": {{batch_id}},\n    \"student_id\": {{student_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches/assign_student.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"assign_student.php"
+							]
+						}
+					}
+				},
+				{
+					"name": "Remove Student from Batch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batch_id\": 2,\n    \"student_id\": {{student_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches/remove_student.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"remove_student.php"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Instructor Operations",
+			"item": [
+				{
+					"name": "Instructor - Create Student Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"creator_id\": {{instructor_id}},\n    \"full_name\": \"Maya Deshmukh\",\n    \"role\": \"student\",\n    \"batch_id\": {{batch_id}},\n    \"password\": \"Nrita2026#\",\n    \"email\": \"maya.deshmukh@nritahub.com\",\n    \"mobile\": \"9876543292\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/create_user.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"create_user.php"
+							]
+						},
+						"description": "Instructors are authorized to create student accounts and assign them to batches."
+					}
+				},
+				{
+					"name": "Instructor - List Assigned Batches",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/batches/list_batches.php?instructor_id={{instructor_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"list_batches.php"
+							],
+							"query": [
+								{
+									"key": "instructor_id",
+									"value": "{{instructor_id}}"
+								}
+							]
+						},
+						"description": "Lists batches taught by the logged-in instructor."
+					}
+				},
+				{
+					"name": "Instructor - Get Batch Attendance Sheet",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/attendance/get_batch_attendance.php?batch_id={{batch_id}}&date=2026-11-02",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendance",
+								"get_batch_attendance.php"
+							],
+							"query": [
+								{
+									"key": "batch_id",
+									"value": "{{batch_id}}"
+								},
+								{
+									"key": "date",
+									"value": "2026-11-02"
+								}
+							]
+						},
+						"description": "Returns enrolled students with present/absent/excused statuses and draft status badge."
+					}
+				},
+				{
+					"name": "Instructor - Mark Batch Attendance (Bulk)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batch_id\": {{batch_id}},\n    \"marked_by\": {{instructor_id}},\n    \"attendance_date\": \"2026-11-02\",\n    \"students\": [\n        {\"student_id\": 20, \"status\": \"Present\"},\n        {\"student_id\": 21, \"status\": \"Absent\", \"notes\": \"Fever\"},\n        {\"student_id\": 22, \"status\": \"Excused\", \"notes\": \"Exam leave\"}\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/attendance/mark_attendance.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendance",
+								"mark_attendance.php"
+							]
+						},
+						"description": "Instructor records attendance for batch students."
+					}
+				},
+				{
+					"name": "Instructor - List Submissions for Review",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/homework/list_submissions.php?instructor_id={{instructor_id}}&status=Pending",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"list_submissions.php"
+							],
+							"query": [
+								{
+									"key": "instructor_id",
+									"value": "{{instructor_id}}"
+								},
+								{
+									"key": "status",
+									"value": "Pending"
+								}
+							]
+						},
+						"description": "Lists pending homework submissions waiting for review."
+					}
+				},
+				{
+					"name": "Instructor - Get Submission Details for Review",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/homework/get_submission.php?id={{submission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"get_submission.php"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{submission_id}}"
+								}
+							]
+						},
+						"description": "Fetches student video, submission note, and evaluation checklist."
+					}
+				},
+				{
+					"name": "Instructor - Publish Review & Evaluation Checklist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"submission_id\": {{submission_id}},\n    \"instructor_id\": {{instructor_id}},\n    \"feedback\": \"Your rhythm is settling beautifully! Practice relaxing your shoulders during the 3rd speed set.\",\n    \"next_step\": \"Practice a comfortable araimandi for 2 minutes daily before recording.\",\n    \"status\": \"Published\",\n    \"checklist\": [\n        {\"id\": \"1\", \"title\": \"Anga Shuddham\", \"description\": \"Body posture and clarity of form\", \"isChecked\": true},\n        {\"id\": \"2\", \"title\": \"Aramandi\", \"description\": \"Proper half-sitting stance maintenance\", \"isChecked\": true},\n        {\"id\": \"3\", \"title\": \"Mudras Clarity\", \"description\": \"Hand gesture accuracy and precision\", \"isChecked\": true},\n        {\"id\": \"4\", \"title\": \"Bhavam\", \"description\": \"Expressive facial and emotional engagement\", \"isChecked\": false},\n        {\"id\": \"5\", \"title\": \"Steps\", \"description\": \"Correct execution of adavu steps\", \"isChecked\": true},\n        {\"id\": \"6\", \"title\": \"Tala\", \"description\": \"Rhythm and time cycle synchronization\", \"isChecked\": true},\n        {\"id\": \"7\", \"title\": \"Leg Posture\", \"description\": \"Foot placement and leg positioning\", \"isChecked\": true},\n        {\"id\": \"8\", \"title\": \"Neatness\", \"description\": \"Cleanliness of movements and execution\", \"isChecked\": true},\n        {\"id\": \"9\", \"title\": \"Body Stiffness\", \"description\": \"Flexibility and absence of unwanted tension\", \"isChecked\": false},\n        {\"id\": \"10\", \"title\": \"Back Position\", \"description\": \"Straight spine and torso alignment\", \"isChecked\": true}\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/homework/review_submission.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"review_submission.php"
+							]
+						},
+						"description": "Instructor publishes evaluation checklist and comments for student submission."
+					}
+				},
+				{
+					"name": "Instructor - Create Homework / Practice Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batch_id\": {{batch_id}},\n    \"instructor_id\": {{instructor_id}},\n    \"title\": \"Nattadavu Steps 1–4\",\n    \"topic\": \"Natta Adavu\",\n    \"description\": \"Practice Natta Adavu with steady shoulder alignment and stretch.\",\n    \"due_date\": \"2026-11-20\",\n    \"reference_media_url\": \"uploads/references/nattadavu_demo.mp4\",\n    \"reference_type\": \"video\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/homework/create_homework.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"create_homework.php"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Student Operations",
+			"item": [
+				{
+					"name": "Student - View Attendance History & Summary",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/attendance/get_student_attendance.php?student_id={{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendance",
+								"get_student_attendance.php"
+							],
+							"query": [
+								{
+									"key": "student_id",
+									"value": "{{student_id}}"
+								}
+							]
+						},
+						"description": "Returns attendance percentage (e.g. 92%), ratio text (12/13), and full history of class dates."
+					}
+				},
+				{
+					"name": "Student - List Homework Assignments",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/homework/list_homework.php?student_id={{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"list_homework.php"
+							],
+							"query": [
+								{
+									"key": "student_id",
+									"value": "{{student_id}}"
+								}
+							]
+						},
+						"description": "Lists homework assigned to student's batch with submission status."
+					}
+				},
+				{
+					"name": "Student - Submit Practice Video & Note",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": {{student_id}},\n    \"batch_id\": {{batch_id}},\n    \"homework_id\": 1,\n    \"topic\": \"Tatta Adavu Practice\",\n    \"student_note\": \"My count feels steadier now. I would love help keeping my shoulders relaxed in the last set.\",\n    \"file_name\": \"ananya_tatta_adavu.mp4\",\n    \"file_details\": \"01:18 · 24 MB · Upload complete\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/homework/submit_homework.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"submit_homework.php"
+							]
+						},
+						"description": "Student submits homework recording and submission note to instructor."
+					}
+				},
+				{
+					"name": "Student - View Practice Feedback & Checklist",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/homework/get_submission.php?id={{submission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"homework",
+								"get_submission.php"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{submission_id}}"
+								}
+							]
+						},
+						"description": "Student views instructor feedback comments and evaluation checklist criteria."
+					}
+				},
+				{
+					"name": "Student - View Fees & Invoices",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/fees/list_fees.php?user_id={{student_id}}&type=student_fee",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"fees",
+								"list_fees.php"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "{{student_id}}"
+								},
+								{
+									"key": "type",
+									"value": "student_fee"
+								}
+							]
+						},
+						"description": "Returns tuition invoices, status (Paid/Pending/Overdue), and amounts."
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Fees & Salary Management",
+			"item": [
+				{
+					"name": "List All Fees & Salary Records",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/fees/list_fees.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"fees",
+								"list_fees.php"
+							]
+						},
+						"description": "Returns both student fee records and staff salary payouts."
+					}
+				},
+				{
+					"name": "Admin - Create Student Fee Structure",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"record_type\": \"student_fee\",\n    \"user_id\": {{student_id}},\n    \"batch_id\": {{batch_id}},\n    \"title\": \"Autumn Recital & Exam Fee\",\n    \"amount\": \"₹3,500\",\n    \"due_date\": \"25 Oct 2026\",\n    \"status\": \"Pending\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/fees/create_fee.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"fees",
+								"create_fee.php"
+							]
+						},
+						"description": "Admin creates a program fee invoice for a student."
+					}
+				},
+				{
+					"name": "Admin - Record Staff Salary Payout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"record_type\": \"staff_salary\",\n    \"user_id\": {{instructor_id}},\n    \"title\": \"November Monthly Salary Payout\",\n    \"amount\": \"₹45,000\",\n    \"due_date\": \"30 Nov 2026\",\n    \"status\": \"Calculated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/fees/create_fee.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"fees",
+								"create_fee.php"
+							]
+						},
+						"description": "Admin records a calculated instructor salary payout."
+					}
+				},
+				{
+					"name": "Update Fee Payment Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 15,\n    \"status\": \"Paid\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/fees/update_fee_status.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"fees",
+								"update_fee_status.php"
+							]
+						},
+						"description": "Marks fee invoice as Paid or Paid Out."
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Announcements & Events",
+			"item": [
+				{
+					"name": "List Announcements & Notices",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/announcements/list_announcements.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"announcements",
+								"list_announcements.php"
+							]
+						},
+						"description": "Lists academy announcements and events."
+					}
+				},
+				{
+					"name": "Admin - Publish Program Announcement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"created_by\": {{admin_id}},\n    \"title\": \"Margazhi Dance Festival Registrations\",\n    \"body\": \"Annual Margazhi Season performance opportunities for Foundation and Intermediate batches. Contact the office for costume fittings.\",\n    \"event_date\": \"15 Dec 2026\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/announcements/create_announcement.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"announcements",
+								"create_announcement.php"
+							]
+						},
+						"description": "Admin publishes notice to student & instructor dashboards."
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Profiles",
+			"item": [
+				{
+					"name": "Fetch Profile",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/profile/fetch_profile.php?user_id={{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile",
+								"fetch_profile.php"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "{{student_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Edit Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": {{student_id}},\n    \"full_name\": \"Ananya Rao\",\n    \"bio\": \"Dedicated student practicing Bharatanatyam Foundation F1.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/profile/edit_profile.php",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile",
+								"edit_profile.php"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}
+
