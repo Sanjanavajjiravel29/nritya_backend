@@ -54,10 +54,22 @@ if ($authUser["role"] === "student" && $batchId) {
 
 // Handle file upload if present
 $uploadedFileKey = null;
-if (isset($_FILES["video_file"]) && $_FILES["video_file"]["error"] === UPLOAD_ERR_OK) {
-    $uploadedFileKey = "video_file";
-} elseif (isset($_FILES["file"]) && $_FILES["file"]["error"] === UPLOAD_ERR_OK) {
-    $uploadedFileKey = "file";
+if (isset($_FILES["video_file"])) {
+    $err = $_FILES["video_file"]["error"];
+    if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+        respond(false, "The uploaded file exceeds the maximum allowed upload limit (128 MB).", 413);
+    } elseif ($err === UPLOAD_ERR_PARTIAL) {
+        respond(false, "The file was only partially uploaded. Please try again.", 400);
+    } elseif ($err === UPLOAD_ERR_OK) {
+        $uploadedFileKey = "video_file";
+    }
+} elseif (isset($_FILES["file"])) {
+    $err = $_FILES["file"]["error"];
+    if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+        respond(false, "The uploaded file exceeds the maximum allowed upload limit (128 MB).", 413);
+    } elseif ($err === UPLOAD_ERR_OK) {
+        $uploadedFileKey = "file";
+    }
 }
 
 if ($uploadedFileKey) {
@@ -66,14 +78,19 @@ if ($uploadedFileKey) {
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
-    $ext = pathinfo($file["name"], PATHINFO_EXTENSION);
-    if (empty($ext)) $ext = "mp4";
-    $safeName = "sub_" . $studentId . "_" . bin2hex(random_bytes(8)) . "." . $ext;
+    $rawExt = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+    $allowedExts = ["mp4", "mov", "avi", "mkv", "webm", "pdf"];
+    if (!in_array($rawExt, $allowedExts)) {
+        respond(false, "Invalid file format. Allowed formats: MP4, MOV, AVI, MKV, WEBM, PDF.", 400);
+    }
+    $safeName = "sub_" . $studentId . "_" . bin2hex(random_bytes(8)) . "." . $rawExt;
     if (move_uploaded_file($file["tmp_name"], $uploadDir . $safeName)) {
         $videoUrl = "uploads/submissions/" . $safeName;
         $fileName = $file["name"];
         $sizeMB = round($file["size"] / (1024 * 1024), 1);
         $fileDetails = "Uploaded · {$sizeMB} MB";
+    } else {
+        respond(false, "Failed to save uploaded file to storage.", 500);
     }
 }
 

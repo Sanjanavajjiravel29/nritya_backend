@@ -289,6 +289,8 @@ CREATE TABLE `users` (
   `bio` text DEFAULT NULL,
   `status` enum('active','inactive') NOT NULL DEFAULT 'active',
   `created_by` int(11) DEFAULT NULL,
+
+  
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `mobile` (`mobile`),
