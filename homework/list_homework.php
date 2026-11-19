@@ -88,12 +88,15 @@ while ($row = $result->fetch_assoc()) {
     
     // Check if authenticated student has submitted
     if ($authUser["role"] === "student") {
-        $subStmt = $conn->prepare("SELECT id, status, video_url, submitted_at FROM homework_submissions WHERE homework_id = ? AND student_id = ? LIMIT 1");
+        $subStmt = $conn->prepare("SELECT id, status, video_url, submitted_at FROM homework_submissions WHERE homework_id = ? AND student_id = ? ORDER BY id DESC LIMIT 1");
         $subStmt->bind_param("ii", $row["id"], $authUser["id"]);
         $subStmt->execute();
         $sub = $subStmt->get_result()->fetch_assoc();
         $subStmt->close();
 
+        if ($sub) {
+            $sub["full_video_url"] = formatMediaUrl($sub["video_url"]);
+        }
         $row["my_submission"] = $sub;
         $row["is_submitted"] = (bool)$sub;
     }
