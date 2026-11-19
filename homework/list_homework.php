@@ -41,11 +41,16 @@ if ($authUser["role"] === "instructor") {
 }
 
 $query = "
-    SELECT h.*, b.batch_name, b.dance_style, b.level,
-           u.full_name as instructor_name, u.staff_role as instructor_role
+    SELECT h.*, b.batch_name, b.dance_style, b.level, b.batch_type,
+           u.full_name as instructor_name, u.staff_role as instructor_role,
+           rv.title as reference_title, rv.category as reference_category,
+           rv.description as reference_description, rv.sollukattu as reference_sollukattu,
+           rv.difficulty_level as reference_difficulty, rv.video_path as reference_video_path,
+           rv.status as reference_status
     FROM homework h
     JOIN batches b ON h.batch_id = b.id
     LEFT JOIN users u ON h.instructor_id = u.id
+    LEFT JOIN reference_videos rv ON h.reference_id = rv.id
     WHERE 1=1
 ";
 
@@ -85,6 +90,24 @@ $result = $stmt->get_result();
 $items = [];
 while ($row = $result->fetch_assoc()) {
     $row["reference_media_full_url"] = formatMediaUrl($row["reference_media_url"]);
+    $row["reference_video_full_url"] = formatMediaUrl($row["reference_video_path"] ?: $row["reference_media_url"]);
+    $row["is_ai_evaluable"] = (bool)$row["is_ai_evaluable"];
+
+    if (!empty($row["reference_id"])) {
+        $row["reference"] = [
+            "id" => (int)$row["reference_id"],
+            "title" => $row["reference_title"],
+            "category" => $row["reference_category"],
+            "description" => $row["reference_description"],
+            "sollukattu" => $row["reference_sollukattu"],
+            "difficulty_level" => $row["reference_difficulty"],
+            "video_path" => $row["reference_video_path"],
+            "video_full_url" => $row["reference_video_full_url"],
+            "status" => $row["reference_status"]
+        ];
+    } else {
+        $row["reference"] = null;
+    }
     
     // Check if authenticated student has submitted
     if ($authUser["role"] === "student") {

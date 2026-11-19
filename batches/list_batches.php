@@ -32,7 +32,7 @@ if ($authUser["role"] === "instructor") {
 }
 
 $query = "
-    SELECT b.id, b.batch_name, b.dance_style, b.level, b.instructor_id, 
+    SELECT b.id, b.batch_name, b.dance_style, b.level, b.batch_type, b.instructor_id, 
            b.capacity, b.studio, b.days, b.start_time, b.end_time, 
            b.monthly_tuition, b.status, b.created_at,
            u.full_name as instructor_name, u.staff_role as instructor_role,
