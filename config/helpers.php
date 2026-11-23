@@ -108,4 +108,37 @@ function generateUsername($conn, $fullName) {
 
     return $base . time();
 }
+
+/**
+ * Asynchronously triggers local AI movement analysis microservice
+ */
+function triggerAiMovementAnalysis($submissionId, $referenceId, $studentVideoRelPath, $refVideoRelPath, $category = "Tatta Adavu") {
+    $backendDir = realpath(__DIR__ . '/..');
+    $studentAbs = $backendDir . '/' . ltrim($studentVideoRelPath, '/');
+    $refAbs = $backendDir . '/' . ltrim($refVideoRelPath, '/');
+
+    $payload = json_encode([
+        "submission_id" => (int)$submissionId,
+        "reference_id" => (int)$referenceId,
+        "student_video_path" => str_replace('\\', '/', $studentAbs),
+        "reference_video_path" => str_replace('\\', '/', $refAbs),
+        "category" => $category
+    ]);
+
+    $ch = curl_init("http://127.0.0.1:8000/analyze");
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($payload)
+    ]);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 800);
+    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1500);
+
+    $res = curl_exec($ch);
+    curl_close($ch);
+
+    return !empty($res);
+}
 ?>

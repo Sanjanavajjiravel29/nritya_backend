@@ -1,0 +1,20 @@
+# Python virtual environment
+ai_service/.venv/
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Environment variables
+.env
+.env.*
+
+# Runtime uploads - keep videos and reports local
+uploads/
+ai_service/config.py
+ai_service/dancer_frame.jpg
+ai_service/frame_test.jpg
+ai_service/student_frame.jpg

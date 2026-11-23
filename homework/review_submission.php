@@ -53,23 +53,37 @@ if (is_array($checklist)) {
     $checklistJson = null;
 }
 
+// Check for linked AI movement analysis
+$aiAnalysisId = null;
+$aiCheckStmt = $conn->prepare("SELECT id FROM ai_movement_analyses WHERE submission_id = ? LIMIT 1");
+$aiCheckStmt->bind_param("i", $submissionId);
+$aiCheckStmt->execute();
+$aiCheckRow = $aiCheckStmt->get_result()->fetch_assoc();
+$aiCheckStmt->close();
+if ($aiCheckRow) {
+    $aiAnalysisId = (int)$aiCheckRow["id"];
+}
+$isAiValidated = ($aiAnalysisId !== null && $status === 'Published') ? 1 : 0;
+
 // Upsert review record
 $stmt = $conn->prepare(
-    "INSERT INTO homework_reviews (submission_id, instructor_id, feedback, next_step, checklist, status)
-     VALUES (?, ?, ?, ?, ?, ?)
+    "INSERT INTO homework_reviews (submission_id, instructor_id, feedback, next_step, checklist, status, ai_analysis_id, is_ai_validated)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE 
        instructor_id = VALUES(instructor_id),
        feedback = VALUES(feedback),
        next_step = VALUES(next_step),
        checklist = COALESCE(VALUES(checklist), checklist),
-       status = VALUES(status)"
+       status = VALUES(status),
+       ai_analysis_id = VALUES(ai_analysis_id),
+       is_ai_validated = VALUES(is_ai_validated)"
 );
 
 if (!$stmt) {
     respond(false, "Database error: " . $conn->error, 500);
 }
 
-$stmt->bind_param("iissss", $submissionId, $instructorId, $feedback, $nextStep, $checklistJson, $status);
+$stmt->bind_param("iissssii", $submissionId, $instructorId, $feedback, $nextStep, $checklistJson, $status, $aiAnalysisId, $isAiValidated);
 
 if ($stmt->execute()) {
     $reviewId = $conn->insert_id ?: $submissionId;

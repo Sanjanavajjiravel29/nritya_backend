@@ -116,6 +116,27 @@ if ($stmt->execute()) {
     $submissionId = $conn->insert_id;
     $stmt->close();
 
+    // Trigger AI movement analysis if assignment is AI-evaluable
+    $aiQueued = false;
+    if ($homeworkId) {
+        $hwStmt = $conn->prepare("SELECT h.is_ai_evaluable, h.reference_id, r.video_path as ref_video_path FROM homework h LEFT JOIN reference_videos r ON h.reference_id = r.id WHERE h.id = ? LIMIT 1");
+        $hwStmt->bind_param("i", $homeworkId);
+        $hwStmt->execute();
+        $hwData = $hwStmt->get_result()->fetch_assoc();
+        $hwStmt->close();
+
+        if ($hwData && !empty($hwData["is_ai_evaluable"]) && !empty($hwData["reference_id"]) && !empty($hwData["ref_video_path"])) {
+            $refId = (int)$hwData["reference_id"];
+            $aiQueueStmt = $conn->prepare("INSERT INTO ai_movement_analyses (submission_id, reference_id, status) VALUES (?, ?, 'QUEUED') ON DUPLICATE KEY UPDATE reference_id = VALUES(reference_id), status = 'QUEUED'");
+            $aiQueueStmt->bind_param("ii", $submissionId, $refId);
+            $aiQueueStmt->execute();
+            $aiQueueStmt->close();
+
+            triggerAiMovementAnalysis($submissionId, $refId, $videoUrl, $hwData["ref_video_path"], $topic);
+            $aiQueued = true;
+        }
+    }
+
     respond(true, "Homework submitted to instructor successfully.", 201, [
         "submission" => [
             "id" => $submissionId,
@@ -128,6 +149,7 @@ if ($stmt->execute()) {
             "file_details" => $fileDetails,
             "student_note" => $studentNote,
             "status" => "Pending",
+            "is_ai_evaluable" => $aiQueued,
             "submitted_at" => date("Y-m-d H:i:s")
         ]
     ]);

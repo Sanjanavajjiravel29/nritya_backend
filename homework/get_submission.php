@@ -19,7 +19,7 @@ if (!$submissionId || $submissionId < 1) {
 }
 
 $stmt = $conn->prepare(
-    "SELECT s.*, 
+    "SELECT s.*,
             u.full_name as student_name, u.email as student_email, u.profile_image as student_image,
             b.batch_name, b.level as batch_level,
             r.id as review_id, r.instructor_id, r.feedback, r.next_step, r.checklist, r.status as review_status, r.reviewed_at,
@@ -60,11 +60,11 @@ $sub["student_image_url"] = formatMediaUrl($sub["student_image"]);
 $nameParts = explode(" ", trim($sub["student_name"]));
 $initials = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ""));
 $sub["student_initials"] = $initials;
-$sub["student_name_and_batch"] = "{$sub['student_name']} · {$sub['batch_name']}";
+$sub["student_name_and_batch"] = "{$sub['student_name']} Â· {$sub['batch_name']}";
 
 // Format submission details string matching UI
 $dateTimeStr = date("j M, g:i A", strtotime($sub["submitted_at"]));
-$sub["submission_details_formatted"] = "{$sub['topic']} · Submitted to instructor on {$dateTimeStr} · {$sub['file_details']}";
+$sub["submission_details_formatted"] = "{$sub['topic']} Â· Submitted to instructor on {$dateTimeStr} Â· {$sub['file_details']}";
 
 // Evaluation checklist default templates
 $defaultChecklist = [
@@ -88,6 +88,36 @@ if (!empty($sub["checklist"])) {
 }
 
 $sub["has_review"] = !empty($sub["review_id"]);
+
+// Attach AI movement analysis if available
+$aiStmt = $conn->prepare("SELECT * FROM ai_movement_analyses WHERE submission_id = ? LIMIT 1");
+$aiStmt->bind_param("i", $submissionId);
+$aiStmt->execute();
+$aiRow = $aiStmt->get_result()->fetch_assoc();
+$aiStmt->close();
+
+if ($aiRow) {
+    $strengths = !empty($aiRow["detected_strengths"]) ? array_values(array_filter(array_map('trim', explode("\n", $aiRow["detected_strengths"])))) : [];
+    $improvements = !empty($aiRow["areas_for_improvement"]) ? array_values(array_filter(array_map('trim', explode("\n", $aiRow["areas_for_improvement"])))) : [];
+
+    $sub["ai_analysis"] = [
+        "id" => (int)$aiRow["id"],
+        "status" => $aiRow["status"],
+        "overall_score" => $aiRow["overall_score"] !== null ? (float)$aiRow["overall_score"] : null,
+        "posture_score" => $aiRow["posture_score"] !== null ? (float)$aiRow["posture_score"] : null,
+        "aramandi_score" => $aiRow["aramandi_score"] !== null ? (float)$aiRow["aramandi_score"] : null,
+        "arm_alignment_score" => $aiRow["arm_alignment_score"] !== null ? (float)$aiRow["arm_alignment_score"] : null,
+        "stability_score" => $aiRow["stability_score"] !== null ? (float)$aiRow["stability_score"] : null,
+        "timing_sync_score" => $aiRow["timing_sync_score"] !== null ? (float)$aiRow["timing_sync_score"] : null,
+        "strengths" => $strengths,
+        "areas_for_improvement" => $improvements,
+        "comparison_snapshot_url" => $aiRow["comparison_snapshot_url"],
+        "comparison_snapshot_full_url" => !empty($aiRow["comparison_snapshot_url"]) ? formatMediaUrl($aiRow["comparison_snapshot_url"]) : null,
+        "completed_at" => $aiRow["completed_at"]
+    ];
+} else {
+    $sub["ai_analysis"] = null;
+}
 
 respond(true, "Submission details fetched successfully.", 200, [
     "submission" => $sub
